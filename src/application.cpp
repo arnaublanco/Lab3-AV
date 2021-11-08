@@ -45,10 +45,14 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 	camera->setPerspective(45.f,window_width/(float)window_height,0.1f,10000.f); //set the projection, we want to be perspective
 
 	{
-		StandardMaterial* mat = new StandardMaterial();
-		SceneNode* node = new SceneNode("Visible node");
-		node->mesh = Mesh::Get("data/meshes/sphere.obj.mbin");
-		//node->model.scale(5, 5, 5);
+		VolumeMaterial* mat = new VolumeMaterial();
+		Volume* v = new Volume();
+		v->loadPNG("data/volumes/bonsai_16_16.png", 16, 16);
+		Texture* t = new Texture();
+		t->create3DFromVolume(v);
+		mat->volume = t;
+		SceneNode* node = new SceneNode("Brain");
+		node->mesh = Mesh::Get("data/meshes/box.obj.mbin");
 		node->material = mat;
 		mat->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/normal.fs");
 		node_list.push_back(node);

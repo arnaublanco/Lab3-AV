@@ -1,14 +1,70 @@
 #include "volume.h"
 #include "utils.h"
-
+#include "texture.h"
 #include "extra/pvmparser.h"
 #include "extra/PerlinNoise.hpp"
 
+
+bool Volume::loadPNG(const char* filename, unsigned int rows, unsigned int columns) {
+	long time = getTime();
+	std::cout << " + Volume loading: " << filename << " ... ";
+	Image* image = NULL;
+	std::string str = filename;
+	std::string ext = str.substr(str.size() - 4, 4);
+
+	image = new Image();
+	bool found = false;
+
+	if (ext == ".tga" || ext == ".TGA")
+		found = image->loadTGA(filename);
+	else if (ext == ".png" || ext == ".PNG")
+		found = image->loadPNG(filename, true);
+	else
+	{
+		std::cout << "[ERROR]: Unsupported Volume format" << std::endl;
+		return false; //unsupported file type
+	}
+
+	if (!found) //file not found
+	{
+		std::cout << " [ERROR]: Volume not found " << std::endl;
+		return false;
+	}
+
+	//Dimensions + Resize From the Image or constants
+	width = image->width / columns;
+	height = image->height / rows;
+	depth = rows * columns;
+
+	widthSpacing = heightSpacing = depthSpacing = 1.0; //No way to know from image
+
+	voxelBytes = 1;
+	voxelChannels = 1;
+	voxelType = 0;
+
+	resize(width, height, depth, voxelChannels, voxelBytes);
+
+	for (unsigned int i = 0; i < image->width * image->height; i++) {
+		unsigned int x = i % width;
+		unsigned int r = (i / image->width);
+		unsigned int y = r % height;
+		unsigned int C = (i - r * image->width) / width;
+		unsigned int R = (r / height);
+		unsigned int z = (columns - C - 1) + R * columns;
+		data[x + (y * width) + (z * width * height)] = image->data[i * 4];
+	}
+
+	delete image;
+
+	std::cout << "[OK] Size: " << width << "x" << height << "x" << depth << " Time: " << (getTime() - time) * 0.001 << "sec" << std::endl;
+	return true;
+}
+
 Volume::Volume() {
 	width = height = depth = 0;
-	widthSpacing = heightSpacing = depthSpacing = 1.0; 
+	widthSpacing = heightSpacing = depthSpacing = 1.0;
 	data = NULL;
-	voxelChannels = 1; 
+	voxelChannels = 1;
 	voxelBytes = 1;
 	voxelType = 0;
 }
@@ -32,8 +88,8 @@ void Volume::resize(int w, int h, int d, unsigned int channels, unsigned int byt
 	depth = d;
 	voxelChannels = channels;
 	voxelBytes = bytes;
-	data = new Uint8[w*h*d*channels*bytes];
-	memset(data, 0, w*h*d*channels*bytes);
+	data = new Uint8[w * h * d * channels * bytes];
+	memset(data, 0, w * h * d * channels * bytes);
 }
 
 void Volume::clear() {
@@ -42,10 +98,10 @@ void Volume::clear() {
 	width = height = depth = 0;
 }
 
-bool Volume::loadVL(const char* filename){
+bool Volume::loadVL(const char* filename) {
 	long time = getTime();
 	std::cout << " + Volume loading: " << filename << " ... ";
-	FILE * file = fopen(filename, "rb");
+	FILE* file = fopen(filename, "rb");
 	if (file == NULL)
 	{
 		std::cout << " [ERROR]: Volume not found " << std::endl;
@@ -86,7 +142,7 @@ bool Volume::loadVL(const char* filename){
 	}
 
 	resize(width, height, depth, voxelChannels, voxelBytes);
-	fread(data, voxelBytes, width*height*depth*voxelChannels*voxelBytes, file);
+	fread(data, voxelBytes, width * height * depth * voxelChannels * voxelBytes, file);
 
 	fclose(file);
 	std::cout << "[OK] Size: " << width << "x" << height << "x" << depth << " Time: " << (getTime() - time) * 0.001 << "sec" << std::endl;
@@ -95,7 +151,7 @@ bool Volume::loadVL(const char* filename){
 
 // http://paulbourke.net/dataformats/pvm/
 // samples: http://schorsch.efi.fh-nuernberg.de/data/volume/
-bool Volume::loadPVM(const char* filename){
+bool Volume::loadPVM(const char* filename) {
 	long time = getTime();
 	std::cout << " + Volume loading: " << filename << " ... ";
 	data = parsePVM(filename, &width, &height, &depth, &voxelChannels, &widthSpacing, &heightSpacing, &depthSpacing);
@@ -109,7 +165,7 @@ bool Volume::loadPVM(const char* filename){
 	return true;
 }
 
-unsigned int Volume::getTextureFormat(){
+unsigned int Volume::getTextureFormat() {
 	unsigned int format = GL_RED;
 	switch (voxelChannels) {
 	case 1:
@@ -128,7 +184,7 @@ unsigned int Volume::getTextureFormat(){
 	return format;
 }
 
-unsigned int Volume::getTextureType(){
+unsigned int Volume::getTextureType() {
 	unsigned int type = GL_UNSIGNED_BYTE;
 	switch (voxelType) {
 	case 0: //unsigned
@@ -155,7 +211,7 @@ unsigned int Volume::getTextureType(){
 	return type;
 }
 
-unsigned int Volume::getTextureInternalFormat(){
+unsigned int Volume::getTextureInternalFormat() {
 	return getTextureFormat();
 }
 
@@ -164,14 +220,14 @@ void Volume::fillSphere() {
 		for (int j = 0; j < height; j++) {
 			for (int k = 0; k < depth; k++) {
 				float f = 0;
-				float x = 2.0*(((float)i / width) - 0.5);
-				float y = 2.0*(((float)j / height) - 0.5);
-				float z = 2.0*(((float)k / depth) - 0.5);
+				float x = 2.0 * (((float)i / width) - 0.5);
+				float y = 2.0 * (((float)j / height) - 0.5);
+				float z = 2.0 * (((float)k / depth) - 0.5);
 
-				f = (1.0 - (x*x + y * y + z * z) / 3.0);
+				f = (1.0 - (x * x + y * y + z * z) / 3.0);
 				f = f < 0.5 ? 0.0 : f;
 
-				data[i + width * j + width * height*k] = (Uint8)(f* 255.0);
+				data[i + width * j + width * height * k] = (Uint8)(f * 255.0);
 			}
 		}
 	}
@@ -191,7 +247,7 @@ void Volume::fillNoise(float frequency, int octaves, unsigned int seed, unsigned
 		for (int j = 0; j < height; j++) {
 			for (int k = 0; k < depth; k++) {
 				float v = perlin.octaveNoise0_1(i / fx, j / fy, k / fz, o);
-				unsigned int index = i + j * width + k * width*height;
+				unsigned int index = i + j * width + k * width * height;
 				data[(index * voxelChannels) + (channel - 1)] = (Uint8)(255 * v);
 			}
 		}
@@ -207,16 +263,16 @@ void Volume::fillWorleyNoise(unsigned int cellsPerSide, unsigned int channel) {
 		std::cout << "Could not fill volume with Worley noise: The volume doesn't have that numer of channels.\n";
 		return;
 	}
-	
+
 	unsigned int side = width;
 
 	unsigned int cells = cellsPerSide;
 	unsigned int subside = side / cells;
 
 	unsigned int pointsCount = pow(cells, 3);
-	vec3 *points = new vec3[pointsCount];
+	vec3* points = new vec3[pointsCount];
 
-	float* _distances = new float[side*side*side];
+	float* _distances = new float[side * side * side];
 
 	//Compute a relative point for each cell
 	for (unsigned int i = 0; i < cells; i++) {
@@ -234,7 +290,7 @@ void Volume::fillWorleyNoise(unsigned int cellsPerSide, unsigned int channel) {
 	for (unsigned int i = 0; i < side; i++) {
 		for (unsigned int j = 0; j < side; j++) {
 			for (unsigned int k = 0; k < side; k++) {
-				vec3 point((float)i/subside, (float)j/subside, (float)k/subside);
+				vec3 point((float)i / subside, (float)j / subside, (float)k / subside);
 				vec3 basep2(std::floor(point.x), std::floor(point.y), std::floor(point.z));
 				float mindist = 10000;
 
@@ -243,8 +299,8 @@ void Volume::fillWorleyNoise(unsigned int cellsPerSide, unsigned int channel) {
 						for (unsigned int dz = 0; dz < 3; dz++) {
 							vec3 p2(basep2.x + dx - 1, basep2.y + dy - 1, basep2.z + dz - 1);
 							vec3 wrappedp2(p2.x == -1 ? cells - 1 : p2.x == cells ? 0 : p2.x,
-											p2.y == -1 ? cells - 1 : p2.y == cells ? 0 : p2.y,
-											p2.z == -1 ? cells - 1 : p2.z == cells ? 0 : p2.z);
+								p2.y == -1 ? cells - 1 : p2.y == cells ? 0 : p2.y,
+								p2.z == -1 ? cells - 1 : p2.z == cells ? 0 : p2.z);
 							unsigned int wrappedindex2 = wrappedp2.x + wrappedp2.y * cells + wrappedp2.z * cells * cells;
 							vec3 point2 = points[wrappedindex2] + p2;
 
@@ -253,7 +309,7 @@ void Volume::fillWorleyNoise(unsigned int cellsPerSide, unsigned int channel) {
 						}
 					}
 				}
-				_distances[i + j*side + k*side*side] = mindist;
+				_distances[i + j * side + k * side * side] = mindist;
 				if (mindist > maxdist) maxdist = mindist;
 			}
 		}
@@ -263,8 +319,8 @@ void Volume::fillWorleyNoise(unsigned int cellsPerSide, unsigned int channel) {
 	for (unsigned int i = 0; i < side; i++) {
 		for (unsigned int j = 0; j < side; j++) {
 			for (unsigned int k = 0; k < side; k++) {
-				unsigned int index = i + j*side + k * side*side;
-				Uint8 v = std::floor( (_distances[index] / maxdist) * 256 );
+				unsigned int index = i + j * side + k * side * side;
+				Uint8 v = std::floor((_distances[index] / maxdist) * 256);
 				data[(index * voxelChannels) + (channel - 1)] = 256 - v;
 			}
 		}
