@@ -34,6 +34,7 @@ class VolumeMaterial : public StandardMaterial {
 public:
 
 	Texture* volume;
+	float ray_step = 0.1;
 
 	VolumeMaterial();
 	~VolumeMaterial();

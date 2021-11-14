@@ -52,7 +52,8 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 		t->create3DFromVolume(v);
 		mat->volume = t;
 		SceneNode* node = new SceneNode("Brain");
-		node->mesh = Mesh::Get("data/meshes/box.obj.mbin");
+		node->mesh = new Mesh();
+		node->mesh->createCube();
 		node->material = mat;
 		mat->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/normal.fs");
 		node_list.push_back(node);
