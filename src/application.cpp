@@ -47,10 +47,12 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 	{
 		VolumeMaterial* mat = new VolumeMaterial();
 		Volume* v = new Volume();
-		v->loadPNG("data/volumes/bonsai_16_16.png", 16, 16);
+		v->loadPNG("data/volumes/foot_16_16.png", 16, 16);
 		Texture* t = new Texture();
-		t->create3DFromVolume(v);
+		t->create3DFromVolume(v, GL_REPEAT);
 		mat->volume = t;
+		mat->jitterTexture = Texture::Get("data/blueNoise.png");
+
 		SceneNode* node = new SceneNode("Brain");
 		node->mesh = new Mesh();
 		node->mesh->createCube();

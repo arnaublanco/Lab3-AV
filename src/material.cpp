@@ -83,12 +83,16 @@ void VolumeMaterial::setUniforms(Camera* camera, Matrix44 model)
 	shader->setUniform("u_time", Application::instance->time);
 	shader->setUniform("u_output", Application::instance->output);
 	shader->setUniform("volume", volume, 0);
+	shader->setUniform("epsilon", epsilon);
 	Matrix44 inv_model = model;
 	inv_model.inverse();
 	shader->setUniform("inv_model", inv_model);
+	shader->setUniform("ray_step", ray_step);
+	shader->setUniform("brightness", brightness);
 
 	//shader->setUniform("u_color", color);
 	shader->setUniform("u_exposure", Application::instance->scene_exposure);
+	shader->setUniform("u_jitter_texture", jitterTexture, 1);
 
 	if (texture)
 		shader->setUniform("u_texture", texture);
@@ -97,6 +101,9 @@ void VolumeMaterial::setUniforms(Camera* camera, Matrix44 model)
 void VolumeMaterial::renderInMenu()
 {
 	ImGui::ColorEdit3("Color", (float*)&color); // Edit 3 floats representing a color
+	ImGui::DragFloat("Ray step", (float*)&ray_step, 0.005, 0.005, 2.0);
+	ImGui::DragFloat("Background threshold", (float*)&epsilon, 0.005, 0.0, 0.5);
+	ImGui::DragFloat("Brightness", (float*)&brightness, 0.1, 0.0, 10);
 }
 
 void StandardMaterial::renderInMenu()

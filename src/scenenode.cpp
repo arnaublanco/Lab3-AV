@@ -57,11 +57,11 @@ void SceneNode::renderInMenu()
 	}
 
 	//Geometry
-	if (mesh && ImGui::TreeNode("Geometry"))
-	{
-		bool changed = false;
-		changed |= ImGui::Combo("Mesh", (int*)&mesh_selected, "SPHERE\0HELMET\0");
+	//if (mesh && ImGui::TreeNode("Geometry"))
+	//{
+	//	bool changed = false;
+	//	changed |= ImGui::Combo("Mesh", (int*)&mesh_selected, "SPHERE\0HELMET\0");
 
-		ImGui::TreePop();
-	}
+	//	ImGui::TreePop();
+	//}
 }

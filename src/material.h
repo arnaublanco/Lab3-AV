@@ -34,7 +34,10 @@ class VolumeMaterial : public StandardMaterial {
 public:
 
 	Texture* volume;
+	Texture* jitterTexture;
 	float ray_step = 0.1;
+	float epsilon = 0.01;
+	float brightness = 1;
 
 	VolumeMaterial();
 	~VolumeMaterial();
