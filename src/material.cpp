@@ -84,13 +84,22 @@ void VolumeMaterial::setUniforms(Camera* camera, Matrix44 model)
 	shader->setUniform("u_output", Application::instance->output);
 	shader->setUniform("volume", volume, 0);
 	shader->setUniform("epsilon", epsilon);
+
 	Matrix44 inv_model = model;
 	inv_model.inverse();
+
 	shader->setUniform("inv_model", inv_model);
 	shader->setUniform("ray_step", ray_step);
 	shader->setUniform("brightness", brightness);
 
-	//shader->setUniform("u_color", color);
+	shader->setUniform("x0", x0);
+	shader->setUniform("y0", y0);
+	shader->setUniform("z0", z0);
+
+	shader->setUniform("a", n[0]);
+	shader->setUniform("b", n[1]);
+	shader->setUniform("c", n[2]);
+
 	shader->setUniform("u_exposure", Application::instance->scene_exposure);
 	shader->setUniform("u_jitter_texture", jitterTexture, 1);
 
@@ -104,6 +113,10 @@ void VolumeMaterial::renderInMenu()
 	ImGui::DragFloat("Ray step", (float*)&ray_step, 0.005, 0.005, 2.0);
 	ImGui::DragFloat("Background threshold", (float*)&epsilon, 0.005, 0.0, 0.5);
 	ImGui::DragFloat("Brightness", (float*)&brightness, 0.1, 0.0, 10);
+	ImGui::DragFloat3("Normal vector", (float*)&n, 0.1, 0.0, 1.0);
+	ImGui::DragFloat("x0", (float*)&x0, 0.1, -10, 10);
+	ImGui::DragFloat("y0", (float*)&y0, 0.1, -10, 10);
+	ImGui::DragFloat("z0", (float*)&z0, 0.1, -10, 10);
 }
 
 void StandardMaterial::renderInMenu()

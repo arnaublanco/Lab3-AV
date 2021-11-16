@@ -35,9 +35,16 @@ public:
 
 	Texture* volume;
 	Texture* jitterTexture;
+
 	float ray_step = 0.1;
 	float epsilon = 0.01;
 	float brightness = 1;
+
+	// Plane definition
+	float x0 = 0.0;
+	float y0 = 0.0;
+	float z0 = 0.0;
+	float n[3] = { 0.0,0.0,1.0 };
 
 	VolumeMaterial();
 	~VolumeMaterial();
