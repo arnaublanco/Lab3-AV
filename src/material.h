@@ -35,10 +35,14 @@ public:
 
 	Texture* volume;
 	Texture* jitterTexture;
+	Texture* tfLUT;
 
 	float ray_step = 0.1;
 	float epsilon = 0.01;
 	float brightness = 1;
+	float h = 0.01;
+
+	int visualization_type = 0;
 
 	// Plane definition
 	float x0 = 0.0;

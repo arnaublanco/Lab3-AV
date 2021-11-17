@@ -4,7 +4,7 @@
 #include "utils.h"
 
 unsigned int SceneNode::lastNameId = 0;
-unsigned int mesh_selected = 0;
+int visualization_type = 0;
 
 SceneNode::SceneNode()
 {
@@ -53,15 +53,15 @@ void SceneNode::renderInMenu()
 	if (material && ImGui::TreeNode("Material"))
 	{
 		material->renderInMenu();
+
+		bool changed = false;
+		changed |= ImGui::Combo("Type of visualization", (int*)&visualization_type, "ACCUMULATION\0ISOSURFACES\0");
+
+		if (changed) {
+			VolumeMaterial* mat = (VolumeMaterial*)material;
+			mat->visualization_type = visualization_type;
+		}
+
 		ImGui::TreePop();
 	}
-
-	//Geometry
-	//if (mesh && ImGui::TreeNode("Geometry"))
-	//{
-	//	bool changed = false;
-	//	changed |= ImGui::Combo("Mesh", (int*)&mesh_selected, "SPHERE\0HELMET\0");
-
-	//	ImGui::TreePop();
-	//}
 }

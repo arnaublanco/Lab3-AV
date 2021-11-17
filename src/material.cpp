@@ -84,6 +84,7 @@ void VolumeMaterial::setUniforms(Camera* camera, Matrix44 model)
 	shader->setUniform("u_output", Application::instance->output);
 	shader->setUniform("volume", volume, 0);
 	shader->setUniform("epsilon", epsilon);
+	shader->setUniform("u_vis_type", (float)visualization_type);
 
 	Matrix44 inv_model = model;
 	inv_model.inverse();
@@ -100,8 +101,11 @@ void VolumeMaterial::setUniforms(Camera* camera, Matrix44 model)
 	shader->setUniform("b", n[1]);
 	shader->setUniform("c", n[2]);
 
+	shader->setUniform("h", h);
+
 	shader->setUniform("u_exposure", Application::instance->scene_exposure);
 	shader->setUniform("u_jitter_texture", jitterTexture, 1);
+	shader->setUniform("u_tfLUT", tfLUT, 2);
 
 	if (texture)
 		shader->setUniform("u_texture", texture);
@@ -117,6 +121,7 @@ void VolumeMaterial::renderInMenu()
 	ImGui::DragFloat("x0", (float*)&x0, 0.1, -10, 10);
 	ImGui::DragFloat("y0", (float*)&y0, 0.1, -10, 10);
 	ImGui::DragFloat("z0", (float*)&z0, 0.1, -10, 10);
+
 }
 
 void StandardMaterial::renderInMenu()

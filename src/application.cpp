@@ -52,6 +52,7 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 		t->create3DFromVolume(v, GL_REPEAT);
 		mat->volume = t;
 		mat->jitterTexture = Texture::Get("data/blueNoise.png");
+		mat->tfLUT = Texture::Get("data/tfLUT.png");
 
 		SceneNode* node = new SceneNode("Brain");
 		node->mesh = new Mesh();
