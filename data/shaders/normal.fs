@@ -45,26 +45,9 @@ vec3 world_to_local(vec3 v_in){
 
 vec3 computeGradient(vec3 sample_pos){
 
-	vec3 f1 = sample_pos;
-	vec3 f2 = sample_pos;
-	vec3 f3 = sample_pos;
-
-	vec3 f4 = sample_pos;
-	vec3 f5 = sample_pos;
-	vec3 f6 = sample_pos;
-
-	f1.x = f1.x + h;
-	f2.x = f2.x - h;
-
-	f3.y = f3.y + h;
-	f4.y = f4.y - h;
-
-	f5.z = f5.z + h;
-	f6.z = f6.z - h;
-
-	float n_x = texture3D(volume, local_to_texture(f1)).x - texture3D(volume, local_to_texture(f2)).x;
-	float n_y = texture3D(volume, local_to_texture(f3)).x - texture3D(volume, local_to_texture(f4)).x;
-	float n_z = texture3D(volume, local_to_texture(f5)).x - texture3D(volume, local_to_texture(f6)).x;
+	float n_x = texture3D(volume, local_to_texture(vec3(sample_pos.x + h, sample_pos.y, sample_pos.z))).x - texture3D(volume, local_to_texture(vec3(sample_pos.x - h, sample_pos.y, sample_pos.z))).x;
+	float n_y = texture3D(volume, local_to_texture(vec3(sample_pos.x, sample_pos.y + h, sample_pos.z))).x - texture3D(volume, local_to_texture(vec3(sample_pos.x, sample_pos.y - h, sample_pos.z))).x;
+	float n_z = texture3D(volume, local_to_texture(vec3(sample_pos.x, sample_pos.y, sample_pos.z + h))).x - texture3D(volume, local_to_texture(vec3(sample_pos.x, sample_pos.y, sample_pos.z - h))).x;
 
 	return vec3(n_x,n_y,n_z)/(2.0*h); 
 }
