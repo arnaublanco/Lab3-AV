@@ -43,6 +43,32 @@ vec3 world_to_local(vec3 v_in){
 	return v_out;
 }
 
+vec3 computeGradient(vec3 sample_pos){
+
+	vec3 f1 = sample_pos;
+	vec3 f2 = sample_pos;
+	vec3 f3 = sample_pos;
+
+	vec3 f4 = sample_pos;
+	vec3 f5 = sample_pos;
+	vec3 f6 = sample_pos;
+
+	f1.x = f1.x + h;
+	f2.x = f2.x - h;
+
+	f3.y = f3.y + h;
+	f4.y = f4.y - h;
+
+	f5.z = f5.z + h;
+	f6.z = f6.z - h;
+
+	float n_x = texture3D(volume, local_to_texture(f1)).x - texture3D(volume, local_to_texture(f2)).x;
+	float n_y = texture3D(volume, local_to_texture(f3)).x - texture3D(volume, local_to_texture(f4)).x;
+	float n_z = texture3D(volume, local_to_texture(f5)).x - texture3D(volume, local_to_texture(f6)).x;
+
+	return vec3(n_x,n_y,n_z)/(2.0*h); 
+}
+
 void main()
 {
 	vec4 final_color = vec4(0.0);
@@ -92,24 +118,19 @@ void main()
 
 		vec3 sample_pos = v_position;
 
-		float n_x = 0.0;
-		float n_y = 0.0;
-		float n_z = 0.0;
+		int count = 0; // Counter to count the number of iterations
 
-		float d = texture3D(volume, local_to_texture(sample_pos)).x; // Density of sample position
-		
-		//final_color = vec4(n_x,n_y,n_z,1.0)/(2.0*h);
-
-		int count = 0;
-
-		while(sample_pos.x > -1.0 && sample_pos.y > -1.0 && sample_pos.z > -1.0 && sample_pos.x < 1.0 && sample_pos.y < 1.0 && sample_pos.z < 1.0 && final_color.a <= 1.0 && count <= N_MAX){
-			
+		while(sample_pos.x > -1.0 && sample_pos.y > -1.0 && sample_pos.z > -1.0 && sample_pos.x < 1.0 && sample_pos.y < 1.0 && sample_pos.z < 1.0 && final_color.a <= 1.0){
 			if(a*sample_pos.x + b*sample_pos.y + c*sample_pos.z + d_plane <= 0){
-				//final_color = 
+				final_color = vec4(computeGradient(sample_pos),1.0);
 			}
-			count = count + 1;
+			sample_pos += ray_dir * ray_step; // Update sample position
+			count = count + 1; // Add up counter
 		}
-		sample_pos += ray_dir * ray_step; // Update sample position
+
+		if(final_color.a < epsilon){
+			discard;
+		}
 		
 	}
 	gl_FragColor = final_color;
