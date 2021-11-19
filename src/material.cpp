@@ -60,6 +60,8 @@ void VolumeMaterial::render(Mesh* mesh, Matrix44 model, Camera* camera)
 {
 	if (mesh && shader)
 	{
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		//enable shader
 		shader->enable();
 
@@ -71,11 +73,13 @@ void VolumeMaterial::render(Mesh* mesh, Matrix44 model, Camera* camera)
 
 		//disable shader
 		shader->disable();
+		glDisable(GL_BLEND);
 	}
 }
 
 void VolumeMaterial::setUniforms(Camera* camera, Matrix44 model)
 {
+
 	//upload node uniforms
 	shader->setUniform("u_viewprojection", camera->viewprojection_matrix);
 	shader->setUniform("u_camera_position", camera->eye);
@@ -121,6 +125,7 @@ void VolumeMaterial::renderInMenu()
 	ImGui::DragFloat("x0", (float*)&x0, 0.1, -10, 10);
 	ImGui::DragFloat("y0", (float*)&y0, 0.1, -10, 10);
 	ImGui::DragFloat("z0", (float*)&z0, 0.1, -10, 10);
+	ImGui::DragFloat("h", (float*)&h, 0.01, 0, 1);
 
 }
 

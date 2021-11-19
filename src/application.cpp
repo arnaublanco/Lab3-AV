@@ -89,6 +89,8 @@ void Application::render(void)
 			node_list[i]->renderWireframe(camera);
 	}
 
+	glDisable(GL_DEPTH_TEST);
+
 	//Draw the floor grid
 	if(render_debug)
 		drawGrid();
