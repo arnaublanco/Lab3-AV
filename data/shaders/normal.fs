@@ -59,30 +59,32 @@ void main()
 
 	vec3 ray_dir = normalize(v_world_position - u_camera_position); // Ray direction
 	ray_dir = world_to_local(ray_dir); // Convert ray direction in world coordinates to local coordinates
+	vec3 sample_pos = v_position;
+
+	float texture_width = 1.0; // Texture width
+	float offset = texture2D(u_jitter_texture, gl_FragCoord.xy / texture_width).x; // Offset for the jittering
 
 	if(u_vis_type == 0.0){
-		float texture_width = 1.0; // Texture width
-		float offset = texture2D(u_jitter_texture, gl_FragCoord.xy / texture_width).x; // Offset for the jittering
 
-		vec3 sample_pos = v_position + ray_dir * offset; // Sample position with jittering offset
+		sample_pos += ray_dir * offset; // Sample position with jittering offset
 
 		float d = texture3D(volume, local_to_texture(sample_pos)).x; // Density of sample position
 		vec2 v = vec2(d,0.0); // 2-D vector for retrieving color based on the density
-		//vec4 sample_color = vec4(d,d,d,d);
-		vec4 sample_color = texture2D(u_tfLUT,v); // Sample color based on the density
+		vec4 sample_color = vec4(d,d,d,d);
+		//vec4 sample_color = texture2D(u_tfLUT,v); // Sample color based on the density
 
 		int count = 0; // Counter to count the number of iterations
 
 		// Check if the sample position is inside the boundaries of the box
-		while(sample_pos.x > -1.0 && sample_pos.y > -1.0 && sample_pos.z > -1.0 && sample_pos.x < 1.0 && sample_pos.y < 1.0 && sample_pos.z < 1.0 && final_color.a <= 1.0 && count <= N_MAX){
+		while(all(greaterThan(sample_pos.xyz, vec3(-1.0))) && all(lessThan(sample_pos.xyz, vec3(1.0))) && final_color.a <= 1.0 && count <= N_MAX){
 		
 			// If the samples are located below (<0) the plane
 			if(a*sample_pos.x + b*sample_pos.y + c*sample_pos.z + d_plane <= 0){
 				final_color += ray_step * (1.0 - final_color.a) * sample_color; // Compute final color (accumulation)
 				d = texture3D(volume, local_to_texture(sample_pos)).x; // Calculate density based on the sample position
-				//sample_color = vec4(d,d,d,d);
+				sample_color = vec4(d,d,d,d);
 				v = vec2(d,0.0); // 2-D for color retrieval
-				sample_color = texture2D(u_tfLUT,v); // Sample color based on the density
+				//sample_color = texture2D(u_tfLUT,v); // Sample color based on the density
 				sample_color.rgb *= sample_color.a; // Homogeneous coordinates
 			}
 			sample_pos += ray_dir * ray_step; // Update sample position
@@ -99,11 +101,11 @@ void main()
 
 	}else{
 
-		vec3 sample_pos = v_position;
-
 		int count = 0; // Counter to count the number of iterations
 
-		while(sample_pos.x > -1.0 && sample_pos.y > -1.0 && sample_pos.z > -1.0 && sample_pos.x < 1.0 && sample_pos.y < 1.0 && sample_pos.z < 1.0 && final_color.a <= 1.0){
+		sample_pos += ray_dir * offset;
+
+		while(all(greaterThan(sample_pos.xyz, vec3(-1.0))) && all(lessThan(sample_pos.xyz, vec3(1.0))) && final_color.a <= 1.0){
 			if(a*sample_pos.x + b*sample_pos.y + c*sample_pos.z + d_plane <= 0){
 				final_color = vec4(computeGradient(sample_pos),1.0);
 			}
