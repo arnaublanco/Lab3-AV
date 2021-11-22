@@ -55,7 +55,7 @@ void SceneNode::renderInMenu()
 		material->renderInMenu();
 
 		bool changed = false;
-		changed |= ImGui::Combo("Type of visualization", (int*)&visualization_type, "ACCUMULATION\0ISOSURFACES\0");
+		changed |= ImGui::Combo("Type of visualization", (int*)&visualization_type, "ACCUMULATION\0TRANSFER FUNCTION\0ISOSURFACES\0");
 
 		if (changed) {
 			VolumeMaterial* mat = (VolumeMaterial*)material;
