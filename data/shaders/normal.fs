@@ -12,7 +12,6 @@ uniform sampler3D volume;
 uniform mat4 model;
 uniform mat4 inv_model;
 
-uniform float epsilon;
 uniform float brightness;
 uniform float h;
 
@@ -28,6 +27,7 @@ uniform float y0;
 uniform float z0;
 
 uniform float u_vis_type;
+uniform float thrIsosurface;
 
 // Function to convert from local to texture coordinates
 vec3 local_to_texture(vec3 v_local){
@@ -70,30 +70,35 @@ void main()
 	vec2 v = vec2(d,0.0); // 2-D vector for retrieving color based on the density
 	vec4 sample_color = vec4(0.0);
 
-	// Check if the sample position is inside the boundaries of the box
 	for(int count = 0; count <= N_MAX; count++){
 
-		if(any(lessThan(sample_pos.xyz, vec3(-1.0))) || any(greaterThan(sample_pos.xyz, vec3(1.0))) || final_color.a > 1.0){
+		// Check if the sample position is inside the boundaries of the box
+		if(any(lessThanEqual(sample_pos.xyz, vec3(-1.0))) || any(greaterThanEqual(sample_pos.xyz, vec3(1.0))) || final_color.a >= 1.0){
 			break;
 		}
 		
 		// If the samples are located below (<0) the plane
-		if(a*sample_pos.x + b*sample_pos.y + c*sample_pos.z + d_plane <= 0){
-			final_color += ray_step * (1.0 - final_color.a) * sample_color; // Compute final color (accumulation)
+		if(a*sample_pos.x + b*sample_pos.y + c*sample_pos.z + d_plane < 0){
 			d = texture3D(volume, local_to_texture(sample_pos)).x; // Calculate density based on the sample position
+			v = vec2(d,0.0); // 2-D for color retrieval
 			if(u_vis_type == 0.0){
 				sample_color = vec4(d,d,d,d);
 			}else if(u_vis_type == 1.0){
 				sample_color = texture2D(u_tfLUT,v); // Sample color based on the density
 			}
+
+			if(u_vis_type == 2.0 && d > thrIsosurface){
+				final_color = vec4(computeGradient(sample_pos),1.0);
+			}else{
+				final_color += ray_step * (1.0 - final_color.a) * sample_color; // Compute final color (accumulation)
+			}
 			
-			v = vec2(d,0.0); // 2-D for color retrieval
 			sample_color.rgb *= sample_color.a; // Homogeneous coordinates
 		}
 		sample_pos += ray_dir * ray_step; // Update sample position
-	}
+	} 
 
-		final_color *= brightness; // Add a brightness factor to final color
+	final_color *= brightness; // Add a brightness factor to final color
 
 	gl_FragColor = final_color;
 

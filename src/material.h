@@ -38,7 +38,6 @@ public:
 	Texture* tfLUT;
 
 	float ray_step = 0.1;
-	float epsilon = 0.01;
 	float brightness = 1;
 	float h = 0.01;
 
@@ -49,6 +48,8 @@ public:
 	float y0 = 0.0;
 	float z0 = 0.0;
 	float n[3] = { 0.0,0.0,1.0 };
+	
+	float thrIsosurface = 0.4;
 
 	VolumeMaterial();
 	~VolumeMaterial();

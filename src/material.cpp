@@ -106,6 +106,7 @@ void VolumeMaterial::setUniforms(Camera* camera, Matrix44 model)
 	shader->setUniform("c", n[2]);
 
 	shader->setUniform("h", h);
+	shader->setUniform("thrIsosurface", thrIsosurface);
 
 	shader->setUniform("u_exposure", Application::instance->scene_exposure);
 	shader->setUniform("u_jitter_texture", jitterTexture, 1);
@@ -119,14 +120,13 @@ void VolumeMaterial::renderInMenu()
 {
 	ImGui::ColorEdit3("Color", (float*)&color); // Edit 3 floats representing a color
 	ImGui::DragFloat("Ray step", (float*)&ray_step, 0.005, 0.005, 2.0);
-	ImGui::DragFloat("Background threshold", (float*)&epsilon, 0.005, 0.0, 0.5);
 	ImGui::DragFloat("Brightness", (float*)&brightness, 0.1, 0.0, 10);
 	ImGui::DragFloat3("Normal vector", (float*)&n, 0.1, 0.0, 1.0);
-	ImGui::DragFloat("x0", (float*)&x0, 0.1, -10, 10);
-	ImGui::DragFloat("y0", (float*)&y0, 0.1, -10, 10);
-	ImGui::DragFloat("z0", (float*)&z0, 0.1, -10, 10);
-	ImGui::DragFloat("h", (float*)&h, 0.01, 0, 1);
-
+	ImGui::DragFloat("x0", (float*)&x0, 0.1, -10.0, 10.0);
+	ImGui::DragFloat("y0", (float*)&y0, 0.1, -10.0, 10.0);
+	ImGui::DragFloat("z0", (float*)&z0, 0.1, -10.0, 10.0);
+	ImGui::DragFloat("h", (float*)&h, 0.01, 0.01, 1.0);
+	ImGui::DragFloat("Threshold Isosurface", (float*)&thrIsosurface, 0.01, 0.0, 1.0);
 }
 
 void StandardMaterial::renderInMenu()
