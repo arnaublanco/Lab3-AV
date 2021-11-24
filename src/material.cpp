@@ -87,6 +87,7 @@ void VolumeMaterial::setUniforms(Camera* camera, Matrix44 model)
 	shader->setUniform("u_time", Application::instance->time);
 	shader->setUniform("u_output", Application::instance->output);
 	shader->setUniform("volume", volume, 0);
+	shader->setUniform("epsilon", epsilon);
 	shader->setUniform("u_vis_type", (float)visualization_type);
 
 	Matrix44 inv_model = model;
