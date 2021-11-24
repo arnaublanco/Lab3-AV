@@ -129,7 +129,7 @@ void VolumeMaterial::renderInMenu()
 	y0 = v[1];
 	z0 = v[2];
 
-	ImGui::DragFloat("h", (float*)&h, 0.01, 0.01, 1.0);
+	ImGui::DragFloat("h", (float*)&h, 0.001, 0.001, 1.0);
 	ImGui::DragFloat("Threshold Isosurface", (float*)&thrIsosurface, 0.01, 0.0, 1.0);
 }
 

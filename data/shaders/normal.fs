@@ -1,4 +1,5 @@
-#define N_MAX 100000
+#define N_MAX 1000000
+#define epsilon 1e-6
 
 varying vec3 v_position;
 varying vec3 v_world_position;
@@ -58,7 +59,8 @@ vec3 computeGradient(vec3 sample_pos){
 	float n_y = texture3D(volume, local_to_texture(vec3(sample_pos.x, sample_pos.y + h, sample_pos.z))).x - texture3D(volume, local_to_texture(vec3(sample_pos.x, sample_pos.y - h, sample_pos.z))).x;
 	float n_z = texture3D(volume, local_to_texture(vec3(sample_pos.x, sample_pos.y, sample_pos.z + h))).x - texture3D(volume, local_to_texture(vec3(sample_pos.x, sample_pos.y, sample_pos.z - h))).x;
 
-	return vec3(n_x,n_y,n_z)/(2.0*h); 
+	//return vec3(n_x,n_y,n_z)/(2.0*h);
+	return vec4(-1.0);
 }
 
 vec4 computePhong(vec3 v_normal, vec3 sample_pos){
@@ -98,7 +100,7 @@ vec4 computePhong(vec3 v_normal, vec3 sample_pos){
 
 void main()
 {
-	vec4 final_color = vec4(0.0);
+	vec4 final_color = vec4(0.0) + epsilon;
 	float d_plane = -(a*x0 + b*y0 + c*z0); // d in the plane equation
 
 	vec3 ray_dir = normalize(v_world_position - u_camera_position); // Ray direction
@@ -112,7 +114,7 @@ void main()
 
 	float d = texture3D(volume, local_to_texture(sample_pos)).x; // Density of sample position
 	vec2 v = vec2(d,0.0); // 2-D vector for retrieving color based on the density
-	vec4 sample_color = vec4(0.0);
+	vec4 sample_color = vec4(0.0) + epsilon;
 
 	for(int count = 0; count <= N_MAX; count++){
 
@@ -122,7 +124,7 @@ void main()
 		}
 		
 		// If the samples are located below (<0) the plane
-		if(a*sample_pos.x + b*sample_pos.y + c*sample_pos.z + d_plane < 0){
+		if(a*sample_pos.x + b*sample_pos.y + c*sample_pos.z + d_plane <= 0){
 			d = texture3D(volume, local_to_texture(sample_pos)).x; // Calculate density based on the sample position
 			v = vec2(d,0.0); // 2-D for color retrieval
 
@@ -132,8 +134,8 @@ void main()
 				sample_color = vec4(d,d,d,d);
 			}
 
-			if(u_phong && d > thrIsosurface){
-				final_color = computePhong(computeGradient(sample_pos),sample_pos);
+			if(u_phong && d >= thrIsosurface){
+				final_color = vec4(normalize(-computeGradient(sample_pos)),1.0);
 			}else if(!u_phong){
 				final_color += ray_step * (1.0 - final_color.a) * sample_color; // Compute final color (accumulation)
 			}
@@ -143,7 +145,8 @@ void main()
 		sample_pos += ray_dir * ray_step; // Update sample position
 	} 
 
-	final_color *= brightness; // Add a brightness factor to final color
+	if(!u_phong)
+		final_color *= brightness; // Add a brightness factor to final color
 
 	gl_FragColor = final_color;
 
