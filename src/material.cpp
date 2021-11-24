@@ -86,9 +86,9 @@ void VolumeMaterial::setUniforms(Camera* camera, Matrix44 model)
 	shader->setUniform("u_model", model);
 	shader->setUniform("u_time", Application::instance->time);
 	shader->setUniform("u_output", Application::instance->output);
-	shader->setUniform("volume", volume, 0);
-	shader->setUniform("epsilon", epsilon);
-	shader->setUniform("u_vis_type", (float)visualization_type);
+	shader->setUniform("volume", volumes[visualization_type], 0);
+	shader->setUniform("u_phong", phong);
+	shader->setUniform("u_transfer_function", transfer_function);
 
 	Matrix44 inv_model = model;
 	inv_model.inverse();
@@ -122,9 +122,13 @@ void VolumeMaterial::renderInMenu()
 	ImGui::DragFloat("Ray step", (float*)&ray_step, 0.005, 0.005, 2.0);
 	ImGui::DragFloat("Brightness", (float*)&brightness, 0.1, 0.0, 10);
 	ImGui::DragFloat3("Normal vector", (float*)&n, 0.1, 0.0, 1.0);
-	ImGui::DragFloat("x0", (float*)&x0, 0.1, -10.0, 10.0);
-	ImGui::DragFloat("y0", (float*)&y0, 0.1, -10.0, 10.0);
-	ImGui::DragFloat("z0", (float*)&z0, 0.1, -10.0, 10.0);
+
+	float v[3] = { x0, y0, z0 };
+	ImGui::DragFloat3("x0 | y0 | z0", (float*)&v, 0.1, -10.0, 10.0);
+	x0 = v[0];
+	y0 = v[1];
+	z0 = v[2];
+
 	ImGui::DragFloat("h", (float*)&h, 0.01, 0.01, 1.0);
 	ImGui::DragFloat("Threshold Isosurface", (float*)&thrIsosurface, 0.01, 0.0, 1.0);
 }
