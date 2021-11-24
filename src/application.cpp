@@ -17,6 +17,7 @@
 bool render_wireframe = false;
 Camera* Application::camera = nullptr;
 Application* Application::instance = NULL;
+const char* volumes[4] = { "data/volumes/bonsai_16_16.png", "data/volumes/foot_16_16.png" , "data/volumes/brain_16_16.png", "data/volumes/teapot_16_16.png" };
 
 Application::Application(int window_width, int window_height, SDL_Window* window)
 {
@@ -46,11 +47,15 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 
 	{
 		VolumeMaterial* mat = new VolumeMaterial();
-		Volume* v = new Volume();
-		v->loadPNG("data/volumes/foot_16_16.png", 16, 16);
-		Texture* t = new Texture();
-		t->create3DFromVolume(v, GL_REPEAT);
-		mat->volume = t;
+
+		for (int i = 0; i < 4; i++) {
+			Volume* v = new Volume();
+			v->loadPNG(volumes[i], 16, 16);
+			Texture* t = new Texture();
+			t->create3DFromVolume(v, GL_REPEAT);
+			mat->volumes[i] = t;
+		}
+
 		mat->jitterTexture = Texture::Get("data/blueNoise.png");
 		mat->tfLUT = Texture::Get("data/tfLUT.png");
 

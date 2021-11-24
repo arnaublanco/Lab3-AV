@@ -26,7 +26,8 @@ uniform float x0;
 uniform float y0;
 uniform float z0;
 
-uniform float u_vis_type;
+uniform bool u_transfer_function;
+uniform bool u_phong;
 uniform float thrIsosurface;
 
 // Function to convert from local to texture coordinates
@@ -43,6 +44,14 @@ vec3 world_to_local(vec3 v_in){
 	return v_out;
 }
 
+// Function to convert from local to world coordinates
+vec3 local_to_world(vec3 v_in){
+	vec4 aux = model * vec4(v_in, 1.0);
+	aux /= aux.a;
+	vec3 v_out = aux.xyz;
+	return v_out;
+}
+
 vec3 computeGradient(vec3 sample_pos){
 
 	float n_x = texture3D(volume, local_to_texture(vec3(sample_pos.x + h, sample_pos.y, sample_pos.z))).x - texture3D(volume, local_to_texture(vec3(sample_pos.x - h, sample_pos.y, sample_pos.z))).x;
@@ -50,6 +59,41 @@ vec3 computeGradient(vec3 sample_pos){
 	float n_z = texture3D(volume, local_to_texture(vec3(sample_pos.x, sample_pos.y, sample_pos.z + h))).x - texture3D(volume, local_to_texture(vec3(sample_pos.x, sample_pos.y, sample_pos.z - h))).x;
 
 	return vec3(n_x,n_y,n_z)/(2.0*h); 
+}
+
+vec4 computePhong(vec3 v_normal, vec3 sample_pos){
+
+	vec3 ambientMaterial = vec3(1.0,1.0,1.0);
+	vec3 diffuseMaterial = vec3(1.0,1.0,1.0);
+	vec3 specularMaterial = vec3(1.0,1.0,1.0);
+
+	vec3 ambientLight = vec3(1.0,1.0,1.0);
+	vec3 diffuseLight = vec3(1.0,1.0,1.0);
+	vec3 specularLight = vec3(1.0,1.0,1.0);
+
+	vec3 light_pos = vec3(1.0,1.0,1.0);
+
+	float alpha = 1.0;
+
+	vec3 sample_world_pos = local_to_world(sample_pos);
+
+	// 1st term
+	vec3 first_term = ambientMaterial*ambientLight;
+
+	// 2nd term
+	vec3 lightVector = normalize(light_pos - sample_world_pos);
+	vec3 N = normalize(v_normal);
+	float L_dot_N = max(0.0,dot(lightVector,N));
+	vec3 second_term = diffuseMaterial*L_dot_N*diffuseLight;
+
+	// 3rd term
+	vec3 R = reflect(-lightVector,N);
+	vec3 V = normalize(u_camera_position - sample_world_pos);
+	float R_dot_V = max(0.0,dot(R,V));
+	float power = pow(R_dot_V,alpha);
+	vec3 third_term = specularMaterial*power*specularLight;
+	
+	return vec4(second_term + third_term,1.0)*vec4(first_term,1.0);
 }
 
 void main()
@@ -81,15 +125,16 @@ void main()
 		if(a*sample_pos.x + b*sample_pos.y + c*sample_pos.z + d_plane < 0){
 			d = texture3D(volume, local_to_texture(sample_pos)).x; // Calculate density based on the sample position
 			v = vec2(d,0.0); // 2-D for color retrieval
-			if(u_vis_type == 0.0){
-				sample_color = vec4(d,d,d,d);
-			}else if(u_vis_type == 1.0){
+
+			if(u_transfer_function){
 				sample_color = texture2D(u_tfLUT,v); // Sample color based on the density
+			}else{
+				sample_color = vec4(d,d,d,d);
 			}
 
-			if(u_vis_type == 2.0 && d > thrIsosurface){
-				final_color = vec4(computeGradient(sample_pos),1.0);
-			}else{
+			if(u_phong && d > thrIsosurface){
+				final_color = computePhong(computeGradient(sample_pos),sample_pos);
+			}else if(!u_phong){
 				final_color += ray_step * (1.0 - final_color.a) * sample_color; // Compute final color (accumulation)
 			}
 			

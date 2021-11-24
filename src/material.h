@@ -33,21 +33,23 @@ public:
 class VolumeMaterial : public StandardMaterial {
 public:
 
-	Texture* volume;
+	Texture* volumes[4] = { NULL, NULL, NULL, NULL };
 	Texture* jitterTexture;
 	Texture* tfLUT;
 
-	float ray_step = 0.1;
-	float brightness = 1;
+	float ray_step = 0.005;
+	float brightness = 4.0;
 	float h = 0.01;
 
 	int visualization_type = 0;
+	bool transfer_function = false;
+	bool phong = false;
 
 	// Plane definition
 	float x0 = 0.0;
 	float y0 = 0.0;
-	float z0 = 0.0;
-	float n[3] = { 0.0,0.0,1.0 };
+	float z0 = 2.0;
+	float n[3] = { 0.0, 0.0, 1.0 };
 	
 	float thrIsosurface = 0.4;
 

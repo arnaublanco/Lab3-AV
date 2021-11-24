@@ -5,6 +5,8 @@
 
 unsigned int SceneNode::lastNameId = 0;
 int visualization_type = 0;
+bool transfer_function = false;
+bool phong = false;
 
 SceneNode::SceneNode()
 {
@@ -54,12 +56,22 @@ void SceneNode::renderInMenu()
 	{
 		material->renderInMenu();
 
-		bool changed = false;
-		changed |= ImGui::Combo("Type of visualization", (int*)&visualization_type, "ACCUMULATION\0TRANSFER FUNCTION\0ISOSURFACES\0");
+		bool changed_vis = false;
+		changed_vis |= ImGui::Combo("Type of visualization", (int*)&visualization_type, "BONSAI\0FOOT\0BRAIN\0TEAPOT\0");
 
-		if (changed) {
+		if (changed_vis) {
 			VolumeMaterial* mat = (VolumeMaterial*)material;
 			mat->visualization_type = visualization_type;
+		}
+
+		bool changed_tp = false;
+		changed_tp |= ImGui::Checkbox("Transfer function", (bool*)&transfer_function);
+		changed_tp |= ImGui::Checkbox("Phong", (bool*)&phong);
+
+		if (changed_tp) {
+			VolumeMaterial* mat = (VolumeMaterial*)material;
+			mat->transfer_function = transfer_function;
+			mat->phong = phong;
 		}
 
 		ImGui::TreePop();
