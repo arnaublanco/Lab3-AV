@@ -59,8 +59,7 @@ vec3 computeGradient(vec3 sample_pos){
 	float n_y = texture3D(volume, local_to_texture(vec3(sample_pos.x, sample_pos.y + h, sample_pos.z))).x - texture3D(volume, local_to_texture(vec3(sample_pos.x, sample_pos.y - h, sample_pos.z))).x;
 	float n_z = texture3D(volume, local_to_texture(vec3(sample_pos.x, sample_pos.y, sample_pos.z + h))).x - texture3D(volume, local_to_texture(vec3(sample_pos.x, sample_pos.y, sample_pos.z - h))).x;
 
-	//return vec3(n_x,n_y,n_z)/(2.0*h);
-	return vec4(-1.0);
+	return vec3(n_x,n_y,n_z)/(2.0*h);
 }
 
 vec4 computePhong(vec3 v_normal, vec3 sample_pos){
@@ -119,12 +118,12 @@ void main()
 	for(int count = 0; count <= N_MAX; count++){
 
 		// Check if the sample position is inside the boundaries of the box
-		if(any(lessThanEqual(sample_pos.xyz, vec3(-1.0))) || any(greaterThanEqual(sample_pos.xyz, vec3(1.0))) || final_color.a >= 1.0){
+		if(any(lessThan(sample_pos.xyz, vec3(-1.0))) || any(greaterThan(sample_pos.xyz, vec3(1.0))) || final_color.a > 1.0){
 			break;
 		}
 		
 		// If the samples are located below (<0) the plane
-		if(a*sample_pos.x + b*sample_pos.y + c*sample_pos.z + d_plane <= 0){
+		if(a*sample_pos.x + b*sample_pos.y + c*sample_pos.z + d_plane < 0){
 			d = texture3D(volume, local_to_texture(sample_pos)).x; // Calculate density based on the sample position
 			v = vec2(d,0.0); // 2-D for color retrieval
 
@@ -135,7 +134,8 @@ void main()
 			}
 
 			if(u_phong && d >= thrIsosurface){
-				final_color = vec4(normalize(-computeGradient(sample_pos)),1.0);
+				vec3 gradient = normalize(computeGradient(sample_pos));
+				final_color = vec4(-gradient,1.0);
 			}else if(!u_phong){
 				final_color += ray_step * (1.0 - final_color.a) * sample_color; // Compute final color (accumulation)
 			}
