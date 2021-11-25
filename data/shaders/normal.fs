@@ -33,6 +33,17 @@ uniform float thrIsosurface;
 uniform float texture_width;
 
 uniform bool u_jittering;
+uniform float alpha;
+
+uniform vec3 ambientLight;
+uniform vec3 specularLight;
+uniform vec3 diffuseLight;
+
+uniform vec3 ambientMaterial;
+uniform vec3 specularMaterial;
+uniform vec3 diffuseMaterial;
+
+uniform vec3 light_pos;
 
 // Function to convert from local to texture coordinates
 vec3 local_to_texture(vec3 v_local){
@@ -66,20 +77,6 @@ vec3 computeGradient(vec3 sample_pos){
 }
 
 vec4 computePhong(vec3 v_normal, vec3 sample_pos){
-
-	vec3 ambientMaterial = vec3(1.0,1.0,1.0);
-	vec3 diffuseMaterial = vec3(1.0,1.0,1.0);
-	vec3 specularMaterial = vec3(1.0,1.0,1.0);
-
-	vec3 ambientLight = vec3(1.0,1.0,1.0);
-	vec3 diffuseLight = vec3(1.0,1.0,1.0);
-	vec3 specularLight = vec3(1.0,1.0,1.0);
-
-	vec3 light_pos = vec3(1.0,1.0,1.0);
-
-	float alpha = 1.0;
-
-	//vec3 sample_world_pos = local_to_world(sample_pos);
 
 	// 1st term
 	vec3 first_term = ambientMaterial*ambientLight;
@@ -153,6 +150,6 @@ void main()
 	if(!u_phong)
 		final_color *= brightness; // Add a brightness factor to final color
 
-	gl_FragColor = final_color;
+	gl_FragColor = vec4(ambientMaterial,1.0);
 
 }
