@@ -9,6 +9,42 @@ bool transfer_function = false;
 bool phong = false;
 bool jittering = false;
 
+Light::Light(const char* name) {
+	this->name = name;
+}
+
+void Light::setUniforms() {
+	shader->setUniform("light_pos", model.getTranslation());
+	shader->setUniform("ambientLight", ambientLight);
+	shader->setUniform("diffuseLight", diffuseLight);
+	shader->setUniform("specularLight", specularLight);
+}
+
+void Light::renderInMenu() {
+
+	if (ImGui::TreeNode("Model"))
+	{
+		float matrixTranslation[3], matrixRotation[3], matrixScale[3];
+		ImGuizmo::DecomposeMatrixToComponents(model.m, matrixTranslation, matrixRotation, matrixScale);
+		ImGui::DragFloat3("Position", matrixTranslation, 0.1f);
+		ImGui::DragFloat3("Rotation", matrixRotation, 0.1f);
+		ImGui::DragFloat3("Scale", matrixScale, 0.1f);
+		ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, matrixRotation, matrixScale, model.m);
+
+		ImGui::TreePop();
+	}
+
+	if (ImGui::TreeNode("Parameters")) {
+
+		ImGui::DragFloat3("Ambient", (float*)&ambientLight, 0.01f, 0.0f, 1.0f);
+		ImGui::DragFloat3("Diffuse", (float*)&diffuseLight, 0.01f, 0.0f, 1.0f);
+		ImGui::DragFloat3("Specular", (float*)&specularLight, 0.01f, 0.0f, 1.0f);
+
+		ImGui::TreePop();
+	}
+
+}
+
 SceneNode::SceneNode()
 {
 	this->name = std::string("Node" + std::to_string(lastNameId++));

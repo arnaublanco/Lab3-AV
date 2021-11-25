@@ -55,6 +55,12 @@ public:
 	float thrIsosurface = 0.4;
 	float texture_width = 1.0;
 
+	float alpha = 0.5;
+
+	Vector3 diffuseMaterial = vec3(1.0, 1.0, 1.0);
+	Vector3 specularMaterial = vec3(1.0, 1.0, 1.0);
+	Vector3 ambientMaterial = vec3(1.0, 1.0, 1.0);
+
 	VolumeMaterial();
 	~VolumeMaterial();
 

@@ -115,6 +115,10 @@ void VolumeMaterial::setUniforms(Camera* camera, Matrix44 model)
 	shader->setUniform("texture_width", texture_width);
 	shader->setUniform("u_jittering", jittering);
 
+	shader->setUniform("diffuseMaterial", diffuseMaterial);
+	shader->setUniform("ambientMaterial", ambientMaterial);
+	shader->setUniform("specularMaterial", specularMaterial);
+
 	if (texture)
 		shader->setUniform("u_texture", texture);
 }
@@ -135,6 +139,12 @@ void VolumeMaterial::renderInMenu()
 	ImGui::DragFloat("h", (float*)&h, 0.005, 0.001, 1.0);
 	ImGui::DragFloat("Threshold Isosurface", (float*)&thrIsosurface, 0.01, 0.0, 1.0);
 	ImGui::DragFloat("Texture width", (float*)&texture_width, 1.0, 0.0, 100.0);
+
+	ImGui::DragFloat("Alpha", (float*)&alpha, 0.1, 0.0, 3.0);
+
+	ImGui::DragFloat3("Ambient", (float*)&ambientMaterial, 0.01f, 0.0f, 1.0f);
+	ImGui::DragFloat3("Diffuse", (float*)&diffuseMaterial, 0.01f, 0.0f, 1.0f);
+	ImGui::DragFloat3("Specular", (float*)&specularMaterial, 0.01f, 0.0f, 1.0f);
 }
 
 void StandardMaterial::renderInMenu()
