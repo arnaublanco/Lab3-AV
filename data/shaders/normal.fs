@@ -79,20 +79,20 @@ vec4 computePhong(vec3 v_normal, vec3 sample_pos){
 
 	float alpha = 1.0;
 
-	vec3 sample_world_pos = local_to_world(sample_pos);
+	//vec3 sample_world_pos = local_to_world(sample_pos);
 
 	// 1st term
 	vec3 first_term = ambientMaterial*ambientLight;
 
 	// 2nd term
-	vec3 lightVector = normalize(light_pos - sample_world_pos);
+	vec3 lightVector = normalize(world_to_local(light_pos) - sample_pos);
 	vec3 N = normalize(v_normal);
 	float L_dot_N = max(0.0,dot(lightVector,N));
 	vec3 second_term = diffuseMaterial*L_dot_N*diffuseLight;
 
 	// 3rd term
 	vec3 R = reflect(-lightVector,N);
-	vec3 V = normalize(u_camera_position - sample_world_pos);
+	vec3 V = normalize(world_to_local(u_camera_position) - sample_pos);
 	float R_dot_V = max(0.0,dot(R,V));
 	float power = pow(R_dot_V,alpha);
 	vec3 third_term = specularMaterial*power*specularLight;
@@ -140,7 +140,7 @@ void main()
 
 			if(u_phong && d >= thrIsosurface){
 				vec3 gradient = normalize(computeGradient(sample_pos));
-				final_color = vec4(-gradient,1.0);
+				final_color = computePhong(-gradient,sample_pos);
 			}else if(!u_phong){
 				final_color += ray_step * (1.0 - final_color.a) * sample_color; // Compute final color (accumulation)
 			}
