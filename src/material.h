@@ -44,6 +44,7 @@ public:
 	int visualization_type = 0;
 	bool transfer_function = false;
 	bool phong = false;
+	bool jittering = false;
 
 	// Plane definition
 	float x0 = 0.0;
@@ -52,6 +53,7 @@ public:
 	float n[3] = { 0.0, 0.0, 1.0 };
 	
 	float thrIsosurface = 0.4;
+	float texture_width = 1.0;
 
 	VolumeMaterial();
 	~VolumeMaterial();

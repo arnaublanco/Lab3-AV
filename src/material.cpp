@@ -112,6 +112,9 @@ void VolumeMaterial::setUniforms(Camera* camera, Matrix44 model)
 	shader->setUniform("u_jitter_texture", jitterTexture, 1);
 	shader->setUniform("u_tfLUT", tfLUT, 2);
 
+	shader->setUniform("texture_width", texture_width);
+	shader->setUniform("u_jittering", jittering);
+
 	if (texture)
 		shader->setUniform("u_texture", texture);
 }
@@ -129,8 +132,9 @@ void VolumeMaterial::renderInMenu()
 	y0 = v[1];
 	z0 = v[2];
 
-	ImGui::DragFloat("h", (float*)&h, 0.001, 0.001, 1.0);
+	ImGui::DragFloat("h", (float*)&h, 0.005, 0.001, 1.0);
 	ImGui::DragFloat("Threshold Isosurface", (float*)&thrIsosurface, 0.01, 0.0, 1.0);
+	ImGui::DragFloat("Texture width", (float*)&texture_width, 1.0, 0.0, 100.0);
 }
 
 void StandardMaterial::renderInMenu()

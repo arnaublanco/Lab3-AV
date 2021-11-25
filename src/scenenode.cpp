@@ -7,6 +7,7 @@ unsigned int SceneNode::lastNameId = 0;
 int visualization_type = 0;
 bool transfer_function = false;
 bool phong = false;
+bool jittering = false;
 
 SceneNode::SceneNode()
 {
@@ -67,11 +68,13 @@ void SceneNode::renderInMenu()
 		bool changed_tp = false;
 		changed_tp |= ImGui::Checkbox("Transfer function", (bool*)&transfer_function);
 		changed_tp |= ImGui::Checkbox("Phong", (bool*)&phong);
+		changed_tp |= ImGui::Checkbox("Jittering", (bool*)&jittering);
 
 		if (changed_tp) {
 			VolumeMaterial* mat = (VolumeMaterial*)material;
 			mat->transfer_function = transfer_function;
 			mat->phong = phong;
+			mat->jittering = jittering;
 		}
 
 		ImGui::TreePop();

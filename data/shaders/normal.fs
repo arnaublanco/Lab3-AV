@@ -30,6 +30,9 @@ uniform float z0;
 uniform bool u_transfer_function;
 uniform bool u_phong;
 uniform float thrIsosurface;
+uniform float texture_width;
+
+uniform bool u_jittering;
 
 // Function to convert from local to texture coordinates
 vec3 local_to_texture(vec3 v_local){
@@ -102,12 +105,14 @@ void main()
 	vec4 final_color = vec4(0.0) + epsilon;
 	float d_plane = -(a*x0 + b*y0 + c*z0); // d in the plane equation
 
-	vec3 ray_dir = normalize(v_world_position - u_camera_position); // Ray direction
-	ray_dir = world_to_local(ray_dir); // Convert ray direction in world coordinates to local coordinates
+	vec3 u_camera_position_local = world_to_local(u_camera_position);
+	vec3 ray_dir = normalize(v_position - u_camera_position_local); // Ray direction
 	vec3 sample_pos = v_position;
 
-	float texture_width = 1.0; // Texture width
-	float offset = texture2D(u_jitter_texture, gl_FragCoord.xy / texture_width).x; // Offset for the jittering
+	float offset = 0.0;
+	if(u_jittering){
+		offset = texture2D(u_jitter_texture, gl_FragCoord.xy/(texture_width + epsilon)).x; // Offset for the jittering
+	}
 
 	sample_pos += ray_dir * offset; // Sample position with jittering offset
 
