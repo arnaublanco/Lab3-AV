@@ -30,7 +30,8 @@ uniform float z0;
 uniform bool u_transfer_function;
 uniform bool u_phong;
 uniform float thrIsosurface;
-uniform float texture_width;
+
+uniform vec4 u_color;
 
 uniform bool u_jittering;
 uniform float alpha;
@@ -76,30 +77,29 @@ vec3 computeGradient(vec3 sample_pos){
 	return vec3(n_x,n_y,n_z)/(2.0*h);
 }
 
-vec4 computePhong(vec3 v_normal, vec3 sample_pos){
+vec4 computePhong(vec3 N, vec3 sample_pos, vec4 color){
 
 	// 1st term
 	vec3 first_term = ambientMaterial*ambientLight;
 
 	// 2nd term
 	vec3 lightVector = normalize(world_to_local(light_pos) - sample_pos);
-	vec3 N = normalize(v_normal);
 	float L_dot_N = max(0.0,dot(lightVector,N));
 	vec3 second_term = diffuseMaterial*L_dot_N*diffuseLight;
 
 	// 3rd term
-	vec3 R = reflect(-lightVector,N);
+	vec3 R = reflect(lightVector,N);
 	vec3 V = normalize(world_to_local(u_camera_position) - sample_pos);
 	float R_dot_V = max(0.0,dot(R,V));
 	float power = pow(R_dot_V,alpha);
 	vec3 third_term = specularMaterial*power*specularLight;
 	
-	return vec4(second_term + third_term,1.0)*vec4(first_term,1.0);
+	return color * vec4(first_term + second_term + third_term,1.0);
 }
 
 void main()
 {
-	vec4 final_color = vec4(0.0) + epsilon;
+	vec4 final_color = vec4(0.0);
 	float d_plane = -(a*x0 + b*y0 + c*z0); // d in the plane equation
 
 	vec3 u_camera_position_local = world_to_local(u_camera_position);
@@ -107,20 +107,21 @@ void main()
 	vec3 sample_pos = v_position;
 
 	float offset = 0.0;
+	float texture_width = 1.0;
 	if(u_jittering){
-		offset = texture2D(u_jitter_texture, gl_FragCoord.xy/(texture_width + epsilon)).x; // Offset for the jittering
+		offset = texture2D(u_jitter_texture, gl_FragCoord.xy/texture_width).x; // Offset for the jittering
 	}
 
-	sample_pos += ray_dir * offset; // Sample position with jittering offset
+	sample_pos += ray_dir * offset * ray_step; // Sample position with jittering offset
 
 	float d = texture3D(volume, local_to_texture(sample_pos)).x; // Density of sample position
 	vec2 v = vec2(d,0.0); // 2-D vector for retrieving color based on the density
-	vec4 sample_color = vec4(0.0) + epsilon;
+	vec4 sample_color = vec4(0.0);
 
 	for(int count = 0; count <= N_MAX; count++){
 
 		// Check if the sample position is inside the boundaries of the box
-		if(any(lessThan(sample_pos.xyz, vec3(-1.0))) || any(greaterThan(sample_pos.xyz, vec3(1.0))) || final_color.a > 1.0){
+		if(any(lessThan(sample_pos.xyz, vec3(-1.0))) || any(greaterThan(sample_pos.xyz, vec3(1.0))) || final_color.a >= 1.0){
 			break;
 		}
 		
@@ -137,7 +138,7 @@ void main()
 
 			if(u_phong && d >= thrIsosurface){
 				vec3 gradient = normalize(computeGradient(sample_pos));
-				final_color = computePhong(-gradient,sample_pos);
+				final_color = computePhong(-gradient,sample_pos,u_color);
 			}else if(!u_phong){
 				final_color += ray_step * (1.0 - final_color.a) * sample_color; // Compute final color (accumulation)
 			}

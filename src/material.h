@@ -53,7 +53,6 @@ public:
 	float n[3] = { 0.0, 0.0, 1.0 };
 	
 	float thrIsosurface = 0.4;
-	float texture_width = 1.0;
 
 	float alpha = 0.5;
 
