@@ -119,6 +119,8 @@ void VolumeMaterial::setUniforms(Camera* camera, Matrix44 model)
 	shader->setUniform("ambientMaterial", ambientMaterial);
 	shader->setUniform("specularMaterial", specularMaterial);
 
+	shader->setUniform("alpha", alpha);
+
 	if (texture)
 		shader->setUniform("u_texture", texture);
 }
@@ -140,7 +142,7 @@ void VolumeMaterial::renderInMenu()
 	ImGui::DragFloat("Threshold Isosurface", (float*)&thrIsosurface, 0.01, 0.0, 1.0);
 	ImGui::DragFloat("Texture width", (float*)&texture_width, 1.0, 0.0, 100.0);
 
-	ImGui::DragFloat("Alpha", (float*)&alpha, 0.1, 0.0, 3.0);
+	ImGui::DragFloat("Alpha", (float*)&alpha, 0.1, 0.1, 5.0);
 
 	ImGui::DragFloat3("Ambient", (float*)&ambientMaterial, 0.01f, 0.0f, 1.0f);
 	ImGui::DragFloat3("Diffuse", (float*)&diffuseMaterial, 0.01f, 0.0f, 1.0f);

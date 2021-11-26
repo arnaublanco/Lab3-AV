@@ -150,6 +150,6 @@ void main()
 	if(!u_phong)
 		final_color *= brightness; // Add a brightness factor to final color
 
-	gl_FragColor = vec4(ambientMaterial,1.0);
+	gl_FragColor = final_color;
 
 }
