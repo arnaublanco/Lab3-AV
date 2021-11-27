@@ -103,7 +103,7 @@ void main()
 	vec3 sample_pos = v_position;
 
 	float offset = 0.0;
-	float texture_width = 1.0;
+	float texture_width = 128.0;
 	if(u_jittering){
 		offset = texture2D(u_jitter_texture, gl_FragCoord.xy/texture_width).x; // Offset for the jittering
 	}
