@@ -94,7 +94,7 @@ void SceneNode::renderInMenu()
 		material->renderInMenu();
 
 		bool changed_vis = false;
-		changed_vis |= ImGui::Combo("Type of visualization", (int*)&visualization_type, "BONSAI\0FOOT\0BRAIN\0TEAPOT\0");
+		changed_vis |= ImGui::Combo("Type of visualization", (int*)&visualization_type, "FOOT\0BONSAI\0BRAIN\0TEAPOT\0");
 
 		if (changed_vis) {
 			VolumeMaterial* mat = (VolumeMaterial*)material;

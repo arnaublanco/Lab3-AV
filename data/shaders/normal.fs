@@ -10,7 +10,7 @@ varying vec4 v_color;
 uniform vec3 u_camera_position;
 uniform float ray_step;
 uniform sampler3D volume;
-uniform mat4 model;
+uniform mat4 u_model;
 uniform mat4 inv_model;
 
 uniform float brightness;
@@ -60,21 +60,17 @@ vec3 world_to_local(vec3 v_in){
 	return v_out;
 }
 
-// Function to convert from local to world coordinates
-vec3 local_to_world(vec3 v_in){
-	vec4 aux = model * vec4(v_in, 1.0);
-	aux /= aux.a;
-	vec3 v_out = aux.xyz;
-	return v_out;
-}
-
 vec3 computeGradient(vec3 sample_pos){
 
 	float n_x = texture3D(volume, local_to_texture(vec3(sample_pos.x + h, sample_pos.y, sample_pos.z))).x - texture3D(volume, local_to_texture(vec3(sample_pos.x - h, sample_pos.y, sample_pos.z))).x;
 	float n_y = texture3D(volume, local_to_texture(vec3(sample_pos.x, sample_pos.y + h, sample_pos.z))).x - texture3D(volume, local_to_texture(vec3(sample_pos.x, sample_pos.y - h, sample_pos.z))).x;
 	float n_z = texture3D(volume, local_to_texture(vec3(sample_pos.x, sample_pos.y, sample_pos.z + h))).x - texture3D(volume, local_to_texture(vec3(sample_pos.x, sample_pos.y, sample_pos.z - h))).x;
 
-	return vec3(n_x,n_y,n_z)/(2.0*h);
+	vec3 n = vec3(n_x,n_y,n_z)/(2.0*h);
+
+	vec4 aux = u_model * vec4(n, 1.0);
+	aux /= aux.a;
+	return n;
 }
 
 vec4 computePhong(vec3 N, vec3 sample_pos, vec4 color){
@@ -114,7 +110,7 @@ void main()
 
 	sample_pos += ray_dir * offset * ray_step; // Sample position with jittering offset
 
-	float d = texture3D(volume, local_to_texture(sample_pos)).x; // Density of sample position
+	float d = texture3D(volume, clamp(local_to_texture(sample_pos),vec3(0.01),vec3(0.99))).x; // Density of sample position
 	vec2 v = vec2(d,0.0); // 2-D vector for retrieving color based on the density
 	vec4 sample_color = vec4(0.0);
 
@@ -127,7 +123,7 @@ void main()
 		
 		// If the samples are located below (<0) the plane
 		if(a*sample_pos.x + b*sample_pos.y + c*sample_pos.z + d_plane < 0){
-			d = texture3D(volume, local_to_texture(sample_pos)).x; // Calculate density based on the sample position
+			d = texture3D(volume, clamp(local_to_texture(sample_pos),vec3(0.01),vec3(0.99))).x; // Calculate density based on the sample position
 			v = vec2(d,0.0); // 2-D for color retrieval
 
 			if(u_transfer_function){
