@@ -128,7 +128,7 @@ void VolumeMaterial::setUniforms(Camera* camera, Matrix44 model)
 void VolumeMaterial::renderInMenu()
 {
 	ImGui::ColorEdit3("Color", (float*)&color); // Edit 3 floats representing a color
-	ImGui::DragFloat("Ray step", (float*)&ray_step, 0.005, 0.005, 2.0);
+	ImGui::DragFloat("Ray step", (float*)&ray_step, 0.005, 0.005, 0.5);
 	ImGui::DragFloat("Brightness", (float*)&brightness, 0.1, 0.0, 10);
 	ImGui::DragFloat3("Normal vector", (float*)&n, 0.1, 0.0, 1.0);
 
