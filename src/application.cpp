@@ -59,12 +59,17 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 		mat->jitterTexture = Texture::Get("data/blueNoise.png");
 		mat->tfLUT = Texture::Get("data/tfLUT.png");
 
-		SceneNode* node = new SceneNode("Brain");
+		SceneNode* node = new SceneNode("Volume");
 		node->mesh = new Mesh();
 		node->mesh->createCube();
 		node->material = mat;
 		mat->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/normal.fs");
 		node_list.push_back(node);
+
+		Light* light = new Light("Light");
+		light->position = Vector3(2.0, 2.0, 2.0);
+		light->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/normal.fs");
+		node_list.push_back(light);
 	}
 	
 	//hide the cursor
@@ -88,10 +93,23 @@ void Application::render(void)
 	glDisable(GL_CULL_FACE);
 
 	for (size_t i = 0; i < node_list.size(); i++) {
-		node_list[i]->render(camera);
+		if (node_list[i]->name == "Light") {
+			Light* light = (Light*)node_list[i]; // Downcast of Light
+			light->shader->enable();
+			light->setUniforms();
+			light->shader->disable();
+		}
+		else {
+			node_list[i]->material->shader->enable();
+			node_list[i]->render(camera);
+			node_list[i]->material->shader->disable();
+		}
 
-		if(render_wireframe)
+		if (render_wireframe) {
+			node_list[i]->material->shader->enable();
 			node_list[i]->renderWireframe(camera);
+			node_list[i]->material->shader->disable();
+		}
 	}
 
 	glDisable(GL_DEPTH_TEST);

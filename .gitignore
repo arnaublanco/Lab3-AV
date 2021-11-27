@@ -3,3 +3,9 @@
 ################################################################################
 
 /.vs/Lab3AV/v16/Browse.VC.opendb
+/.vs/Lab3-AV/v16
+/.vs
+/visualstudio15
+/framework_debug.exe
+/framework_debug.pdb
+/imgui.ini
