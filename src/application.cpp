@@ -17,7 +17,7 @@
 bool render_wireframe = false;
 Camera* Application::camera = nullptr;
 Application* Application::instance = NULL;
-const char* volumes[4] = { "data/volumes/bonsai_16_16.png", "data/volumes/foot_16_16.png" , "data/volumes/brain_16_16.png", "data/volumes/teapot_16_16.png" };
+const char* volumes[4] = { "data/volumes/foot_16_16.png", "data/volumes/bonsai_16_16.png", "data/volumes/brain_16_16.png", "data/volumes/teapot_16_16.png" };
 
 Application::Application(int window_width, int window_height, SDL_Window* window)
 {
@@ -58,6 +58,7 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 
 		mat->jitterTexture = Texture::Get("data/blueNoise.png");
 		mat->tfLUT = Texture::Get("data/tfLUT.png");
+		mat->color = Vector4(0.946, 0.46, 0.121, 1.0);
 
 		SceneNode* node = new SceneNode("Volume");
 		node->mesh = new Mesh();

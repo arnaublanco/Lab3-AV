@@ -37,7 +37,7 @@ public:
 	Texture* jitterTexture;
 	Texture* tfLUT;
 
-	float ray_step = 0.005;
+	float ray_step = 0.01;
 	float brightness = 4.0;
 	float h = 0.01;
 
