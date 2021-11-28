@@ -71,7 +71,7 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 		node_list.push_back(node);
 
 		Light* light = new Light("Light");
-		light->position = Vector3(2.0, 2.0, 2.0);
+		light->model.setTranslation(0.0, 2.0, 0.0);
 		light->shader = Shader::Get("data/shaders/basic.vs", "data/shaders/normal.fs");
 		node_list.push_back(light);
 	}

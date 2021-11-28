@@ -30,7 +30,7 @@ public:
 
 class Light : public SceneNode {
 public:
-	Vector3 position = vec3(0.0, 0.0, 0.0);
+	Vector3 position = model.getTranslation();
 	Vector3 diffuseLight = vec3(1.0, 1.0, 1.0);
 	Vector3 specularLight = vec3(1.0, 1.0, 1.0);
 	Vector3 ambientLight = vec3(1.0, 1.0, 1.0);
