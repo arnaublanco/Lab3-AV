@@ -88,7 +88,7 @@ void VolumeMaterial::setUniforms(Camera* camera, Matrix44 model)
 	shader->setUniform("u_output", Application::instance->output);
 	shader->setUniform("volume", volumes[visualization_type], 0);
 	shader->setUniform("u_phong", phong);
-	shader->setUniform("u_transfer_function", transfer_function);
+	shader->setUniform("u_transfer_function", transfer_function[visualization_type]);
 
 	Matrix44 inv_model = model;
 	inv_model.inverse();
