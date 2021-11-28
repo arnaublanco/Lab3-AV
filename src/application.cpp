@@ -57,7 +57,7 @@ Application::Application(int window_width, int window_height, SDL_Window* window
 			mat->volumes[i] = t;
 
 			Texture* t_LUT = new Texture();
-			mat->tfLUT[i] = Texture::Get(LUTs[i])
+			mat->tfLUT[i] = Texture::Get(LUTs[i]);
 		}
 
 		mat->jitterTexture = Texture::Get("data/blueNoise.png");

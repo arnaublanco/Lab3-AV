@@ -88,7 +88,7 @@ void VolumeMaterial::setUniforms(Camera* camera, Matrix44 model)
 	shader->setUniform("u_output", Application::instance->output);
 	shader->setUniform("volume", volumes[visualization_type], 0);
 	shader->setUniform("u_phong", phong);
-	shader->setUniform("u_transfer_function", transfer_function[visualization_type]);
+	shader->setUniform("u_transfer_function", transfer_function);
 
 	Matrix44 inv_model = model;
 	inv_model.inverse();
@@ -110,7 +110,7 @@ void VolumeMaterial::setUniforms(Camera* camera, Matrix44 model)
 
 	shader->setUniform("u_exposure", Application::instance->scene_exposure);
 	shader->setUniform("u_jitter_texture", jitterTexture, 1);
-	shader->setUniform("u_tfLUT", tfLUT, 2);
+	shader->setUniform("u_tfLUT", tfLUT[visualization_type], 2);
 
 	shader->setUniform("u_jittering", jittering);
 
