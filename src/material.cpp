@@ -110,7 +110,7 @@ void VolumeMaterial::setUniforms(Camera* camera, Matrix44 model)
 
 	shader->setUniform("u_exposure", Application::instance->scene_exposure);
 	shader->setUniform("u_jitter_texture", jitterTexture, 1);
-	shader->setUniform("u_tfLUT", tfLUT, 2);
+	shader->setUniform("u_tfLUT", tfLUT[visualization_type], 2);
 
 	shader->setUniform("u_jittering", jittering);
 

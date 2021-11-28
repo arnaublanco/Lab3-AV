@@ -35,7 +35,7 @@ public:
 
 	Texture* volumes[4] = { NULL, NULL, NULL, NULL };
 	Texture* jitterTexture;
-	Texture* tfLUT;
+	Texture* tfLUT[4] = { NULL, NULL, NULL, NULL };
 
 	float ray_step = 0.01;
 	float brightness = 4.0;
