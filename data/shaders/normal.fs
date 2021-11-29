@@ -70,7 +70,7 @@ vec3 computeGradient(vec3 sample_pos){
 
 	vec4 aux = u_model * vec4(n, 1.0);
 	aux /= aux.a;
-	return n;
+	return aux.xyz;
 }
 
 vec4 computePhong(vec3 N, vec3 sample_pos, vec4 color){
